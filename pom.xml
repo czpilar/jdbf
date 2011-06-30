@@ -31,6 +31,12 @@
 		</developer>
 	</developers>
 
+	<scm>
+		<connection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</connection>
+		<developerConnection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</developerConnection>
+		<url>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</url>
+	</scm>
+
 	<properties>
 		<java.target>1.6</java.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
