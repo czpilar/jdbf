@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<parent>
 		<groupId>net.czpilar.maven</groupId>
@@ -11,7 +10,7 @@
 	<groupId>net.czpilar.jdbf</groupId>
 	<artifactId>jdbf</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.0</version>
 	<name>jdbf</name>
 
 	<developers>
@@ -86,4 +85,10 @@
 		</dependency>
 	</dependencies>
 
+
+  <scm>
+    <connection>scm:svn:http://dev.czpilar.net/svn/dev/java/maven/root-project/tags/1.2.0</connection>
+    <developerConnection>scm:svn:http://dev.czpilar.net/svn/dev/java/maven/root-project/tags/1.2.0</developerConnection>
+    <url>scm:svn:http://dev.czpilar.net/svn/dev/java/maven/root-project/tags/1.2.0</url>
+  </scm>
 </project>
