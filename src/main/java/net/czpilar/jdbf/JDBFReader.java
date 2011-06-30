@@ -1,6 +1,6 @@
 package net.czpilar.jdbf;
 
-import static net.czpilar.jdbf.context.JDBFContext.BYTE_HEADER_END;
+import static net.czpilar.jdbf.context.JDBFContext.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,11 +14,12 @@ import net.czpilar.jdbf.fields.JHeaderField;
 import net.czpilar.jdbf.fields.JRow;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JDBFReader {
 
-	private static final Logger logger = Logger.getLogger(JDBFReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JDBFReader.class);
 
 	private List<JHeaderField> headers = new ArrayList<JHeaderField>();
 	private List<JRow> rows = new ArrayList<JRow>();
@@ -53,7 +54,7 @@ public class JDBFReader {
 					+ JDBFSupportedDbaseVersion.DBASE_VII.getVersion() + "]");
 		}
 
-		logger.debug("Found dbase version in byte: " + dbaseVersion);
+		LOG.debug("Found dbase version in byte: " + dbaseVersion);
 
 		// read header
 		int rowLength = 0;
