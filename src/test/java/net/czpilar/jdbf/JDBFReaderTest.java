@@ -25,4 +25,22 @@ public class JDBFReaderTest {
 		assertEquals(23, reader5.getRowCount());
 	}
 
+	@Test
+	public void testJDBFReaderStringDbase7EndByteProblem() {
+
+		JDBFReader reader = new JDBFReader("data/2012-04-16_dbase_7/Zbozi_Anef.dbf");
+		assertNotNull(reader);
+		assertEquals(33, reader.getHeaderSize());
+		assertEquals(24, reader.getRowCount());
+	}
+
+	@Test
+	public void testJDBFReaderStringDbase7EndByteProblem2() {
+
+		JDBFReader reader = new JDBFReader("data/2012-04-16_dbase_7/Zbozi_A.dbf");
+		assertNotNull(reader);
+		assertEquals(33, reader.getHeaderSize());
+		assertEquals(24, reader.getRowCount());
+	}
+
 }

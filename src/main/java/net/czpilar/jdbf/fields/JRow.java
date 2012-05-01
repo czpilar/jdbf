@@ -44,7 +44,7 @@ public class JRow {
 		byte[] val = getBytes(bytes, offset, JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion));
 
 		// no more rows - end of file
-		if (val[0] == BYTE_END_OF_FILE) {
+		if (val == null || val[0] == BYTE_END_OF_FILE) {
 			return null;
 		}
 
@@ -90,6 +90,10 @@ public class JRow {
 	}
 
 	private static byte[] getBytes(byte[] bytes, int offset, int length) {
+
+		if (bytes.length == offset) {
+			return null;
+		}
 
 		byte[] ret = new byte[length];
 
