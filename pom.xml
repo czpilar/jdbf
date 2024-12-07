@@ -1,94 +1,91 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-		<groupId>net.czpilar.maven</groupId>
-		<artifactId>root-project</artifactId>
-		<version>1.2.0</version>
-	</parent>
+    <parent>
+        <groupId>net.czpilar.maven</groupId>
+        <artifactId>root-project</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.czpilar.jdbf</groupId>
-	<artifactId>jdbf</artifactId>
-	<packaging>jar</packaging>
-	<version>1.2.3-SNAPSHOT</version>
-	<name>jdbf</name>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.czpilar.jdbf</groupId>
+    <artifactId>jdbf</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0.0-SNAPSHOT</version>
+    <name>jdbf</name>
 
-	<developers>
-		<developer>
-			<id>david.pilar</id>
-			<name>David Pilař</name>
-			<email>david@czpilar.net</email>
-			<url>http://czpilar.net</url>
-			<roles>
-				<role>designer</role>
-				<role>developer</role>
-				<role>system configuration</role>
-			</roles>
-			<timezone>+2</timezone>
-			<organization>czpilar.net</organization>
-			<organizationUrl>http://czpilar.net</organizationUrl>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <id>david.pilar</id>
+            <name>David Pilař</name>
+            <email>david@czpilar.net</email>
+            <url>http://czpilar.net</url>
+            <roles>
+                <role>designer</role>
+                <role>developer</role>
+                <role>system configuration</role>
+            </roles>
+            <timezone>+2</timezone>
+            <organization>czpilar.net</organization>
+            <organizationUrl>http://czpilar.net</organizationUrl>
+        </developer>
+    </developers>
 
-	<scm>
-		<connection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</connection>
-		<developerConnection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</developerConnection>
-		<url>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</url>
-	</scm>
+    <scm>
+        <connection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</connection>
+        <developerConnection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</developerConnection>
+        <url>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</url>
+    </scm>
 
-	<properties>
-		<java.target>1.6</java.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <java.target>17</java.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<version.junit>4.8.2</version.junit>
-		<version.commons-io>2.0.1</version.commons-io>
-		<version.commons-lang>2.6</version.commons-lang>
-		<version.logback>0.9.29</version.logback>
-		<version.slf4j>1.6.1</version.slf4j>
-	</properties>
+        <version.junit>4.13.2</version.junit>
+        <version.slf4j>1.7.36</version.slf4j>
+        <version.logback>1.2.13</version.logback>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${version.junit}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${version.commons-io}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>${version.commons-lang}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${version.slf4j}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
-			<version>${version.slf4j}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${version.slf4j}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>${version.logback}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${version.logback}</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${version.slf4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${version.slf4j}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${version.slf4j}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${version.logback}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version.logback}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 
 </project>

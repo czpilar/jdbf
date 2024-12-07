@@ -1,197 +1,175 @@
 package net.czpilar.jdbf;
 
-import static net.czpilar.jdbf.context.JDBFContext.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.czpilar.jdbf.context.JDBFContext;
 import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import net.czpilar.jdbf.exceptions.JDBFException;
 import net.czpilar.jdbf.fields.JHeaderField;
 import net.czpilar.jdbf.fields.JRow;
-
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static net.czpilar.jdbf.context.JDBFContext.BYTE_HEADER_END;
+
 public class JDBFReader {
 
-	private static final Logger LOG = LoggerFactory.getLogger(JDBFReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JDBFReader.class);
 
-	private List<JHeaderField> headers = new ArrayList<JHeaderField>();
-	private List<JRow> rows = new ArrayList<JRow>();
+    private final List<JHeaderField> headers = new ArrayList<>();
+    private final List<JRow> rows = new ArrayList<>();
 
-	public JDBFReader(String filename) {
+    public JDBFReader(String filename) {
+        this(new File(filename));
+    }
 
-		this(new File(filename));
-	}
+    public JDBFReader(File file) {
+        try {
+            createJDBF(Files.readAllBytes(file.toPath()));
+        } catch (IOException e) {
+            throw new JDBFException(e);
+        }
+    }
 
-	public JDBFReader(File file) {
+    public JDBFReader(byte[] bytes) {
+        createJDBF(bytes);
+    }
 
-		try {
-			byte[] bytes = FileUtils.readFileToByteArray(file);
-			createJDBF(bytes);
-		} catch (IOException e) {
-			throw new JDBFException(e);
-		}
-	}
+    private void createJDBF(byte[] bytes) {
+        JDBFSupportedDbaseVersion dbaseVersion = JDBFContext.isDbaseVersionSupported(bytes[0]);
 
-	public JDBFReader(byte[] bytes) {
+        if (dbaseVersion == null) {
+            throw new JDBFException("Unsupported dBase file: " + bytes[0] + "... Supported only DBASE V ["
+                    + JDBFSupportedDbaseVersion.DBASE_V.getVersion() + "], DBASE VII ["
+                    + JDBFSupportedDbaseVersion.DBASE_VII.getVersion() + "]");
+        }
 
-		createJDBF(bytes);
-	}
+        LOG.debug("Found dbase version in byte: {}", dbaseVersion);
 
-	private void createJDBF(byte[] bytes) {
+        // read header
+        int rowLength = 0;
 
-		JDBFSupportedDbaseVersion dbaseVersion = JDBFContext.isDbaseVersionSupported(bytes[0]);
+        for (int i = JDBFContext.getOffsetHeaderStart(dbaseVersion); i < bytes.length; i += JDBFContext
+                .getOffsetHeaderLengthTotal(dbaseVersion)) {
 
-		if (dbaseVersion == null) {
-			throw new JDBFException("Unsupported dBase file: " + bytes[0] + "... Supported only DBASE V ["
-					+ JDBFSupportedDbaseVersion.DBASE_V.getVersion() + "], DBASE VII ["
-					+ JDBFSupportedDbaseVersion.DBASE_VII.getVersion() + "]");
-		}
+            // end of header
+            if (bytes[i] == BYTE_HEADER_END) {
+                break;
+            }
 
-		LOG.debug("Found dbase version in byte: " + dbaseVersion);
+            JHeaderField jHeader = JHeaderField.getInstance(bytes, i, dbaseVersion);
+            headers.add(jHeader);
 
-		// read header
-		int rowLength = 0;
+            rowLength += jHeader.getLength();
+        }
 
-		for (int i = JDBFContext.getOffsetHeaderStart(dbaseVersion); i < bytes.length; i += JDBFContext
-				.getOffsetHeaderLengthTotal(dbaseVersion)) {
+        // read rows
+        int offsetRow = JDBFContext.getOffsetHeaderStart(dbaseVersion) + headers.size()
+                * JDBFContext.getOffsetHeaderLengthTotal(dbaseVersion)
+                + JDBFContext.getOffsetHeaderDelimiterLength(dbaseVersion);
 
-			// end of header
-			if (bytes[i] == BYTE_HEADER_END) {
-				break;
-			}
+        JRow row;
+        while ((row = JRow.getInstance(bytes, offsetRow, headers)) != null) {
+            rows.add(row);
+            offsetRow += rowLength + JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion);
+        }
+    }
 
-			JHeaderField jHeader = JHeaderField.getInstance(bytes, i, dbaseVersion);
-			headers.add(jHeader);
+    /**
+     * Get row values of rowNum.
+     *
+     * @param rowNum
+     * @return
+     */
+    private List<Object> getRowValues(int rowNum) {
+        if (rowNum < 0 || rowNum >= rows.size()) {
+            return null;
+        }
+        return rows.get(rowNum).getValues();
+    }
 
-			rowLength += jHeader.getLength();
-		}
+    /**
+     * Returns header size.
+     *
+     * @return
+     */
+    public int getHeaderSize() {
+        return headers.size();
+    }
 
-		// read rows
-		int offsetRow = JDBFContext.getOffsetHeaderStart(dbaseVersion) + headers.size()
-				* JDBFContext.getOffsetHeaderLengthTotal(dbaseVersion)
-				+ JDBFContext.getOffsetHeaderDelimiterLength(dbaseVersion);
+    /**
+     * Returns header field position by name, if no name found returns -1.
+     *
+     * @param name
+     * @return
+     */
+    public int getHeaderPosition(String name) {
+        return IntStream.range(0, headers.size())
+                .filter(i -> headers.get(i).getName().equals(name))
+                .findFirst()
+                .orElse(-1);
+    }
 
-		JRow row = null;
-		while ((row = JRow.getInstance(bytes, offsetRow, headers)) != null) {
-			rows.add(row);
-			offsetRow += rowLength + JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion);
-		}
-	}
+    /**
+     * Returns header object by name.
+     *
+     * @param name
+     * @return
+     */
+    public JHeaderField getHeader(String name) {
+        return getHeader(getHeaderPosition(name));
+    }
 
-	/**
-	 * Get row values of rowNum.
-	 * 
-	 * @param rowNum
-	 * @return
-	 */
-	private List<Object> getRowValues(int rowNum) {
+    /**
+     * Returns header object by position.
+     *
+     * @param pos
+     * @return
+     */
+    public JHeaderField getHeader(int pos) {
+        if (pos < 0 || pos >= headers.size()) {
+            return null;
+        }
+        return headers.get(pos);
+    }
 
-		if (rowNum < 0 || rowNum >= rows.size()) {
-			return null;
-		}
+    /**
+     * Returns count rows.
+     *
+     * @return
+     */
+    public int getRowCount() {
+        return rows.size();
+    }
 
-		return rows.get(rowNum).getValues();
-	}
+    /**
+     * Returns value by position within header and rowNum.
+     *
+     * @param pos
+     * @param rowNum
+     * @return
+     */
+    public Object getValue(int pos, int rowNum) {
+        if (pos < 0 || pos >= headers.size()) {
+            return null;
+        }
+        List<Object> rowValues = getRowValues(rowNum);
+        return rowValues == null ? null : rowValues.get(pos);
+    }
 
-	/**
-	 * Returns header size.
-	 * 
-	 * @return
-	 */
-	public int getHeaderSize() {
-
-		return headers.size();
-	}
-
-	/**
-	 * Returns header field position by name, if no name found returns -1.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public int getHeaderPosition(String name) {
-
-		for (int i = 0; i < headers.size(); i++) {
-			if (headers.get(i).getName().equals(name)) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Returns header object by name.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public JHeaderField getHeader(String name) {
-
-		int pos = getHeaderPosition(name);
-
-		return getHeader(pos);
-	}
-
-	/**
-	 * Returns header object by position.
-	 * 
-	 * @param pos
-	 * @return
-	 */
-	public JHeaderField getHeader(int pos) {
-
-		if (pos < 0 || pos >= headers.size()) {
-			return null;
-		}
-
-		return headers.get(pos);
-	}
-
-	/**
-	 * Returns count rows.
-	 * 
-	 * @return
-	 */
-	public int getRowCount() {
-
-		return rows.size();
-	}
-
-	/**
-	 * Returns value by position within header and rowNum.
-	 * 
-	 * @param pos
-	 * @param rowNum
-	 * @return
-	 */
-	public Object getValue(int pos, int rowNum) {
-
-		if (pos < 0 || pos >= headers.size()) {
-			return null;
-		}
-
-		List<Object> rowValues = getRowValues(rowNum);
-		return rowValues == null ? null : rowValues.get(pos);
-	}
-
-	/**
-	 * Returns value by header name and rowNum.
-	 * 
-	 * @param name
-	 * @param rowNum
-	 * @return
-	 */
-	public Object getValue(String name, int rowNum) {
-
-		int pos = getHeaderPosition(name);
-		return getValue(pos, rowNum);
-	}
+    /**
+     * Returns value by header name and rowNum.
+     *
+     * @param name
+     * @param rowNum
+     * @return
+     */
+    public Object getValue(String name, int rowNum) {
+        return getValue(getHeaderPosition(name), rowNum);
+    }
 }

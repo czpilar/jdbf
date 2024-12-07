@@ -1,8 +1,7 @@
 package net.czpilar.jdbf.fields;
 
-import static net.czpilar.jdbf.context.JDBFContext.BYTE_END_OF_FILE;
-import static net.czpilar.jdbf.context.JDBFContext.BYTE_ROW_DELETED;
-import static net.czpilar.jdbf.context.JDBFContext.OUTPUT_ENCODING;
+import net.czpilar.jdbf.context.JDBFContext;
+import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,260 +9,225 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import net.czpilar.jdbf.context.JDBFContext;
-import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
-import net.czpilar.jdbf.exceptions.JDBFException;
-
-import org.apache.commons.lang.StringUtils;
+import static net.czpilar.jdbf.context.JDBFContext.*;
 
 public class JRow {
 
-	private List<Object> values = new ArrayList<Object>();
-	private boolean deleted;
+    private final List<Object> values = new ArrayList<>();
+    private boolean deleted;
 
-	private JRow() {
+    private JRow() {
+    }
 
-	}
+    /**
+     * Creates instance of row.
+     *
+     * @param bytes
+     * @param start
+     * @param headers
+     * @return
+     */
+    public static JRow getInstance(byte[] bytes, int start, List<JHeaderField> headers) {
+        JDBFSupportedDbaseVersion dbaseVersion = headers.get(0).getDbaseVersion();
 
-	/**
-	 * Creates instance of row.
-	 * 
-	 * @param bytes
-	 * @param start
-	 * @param headers
-	 * @return
-	 */
-	public static JRow getInstance(byte[] bytes, int start, List<JHeaderField> headers) {
+        JRow row = new JRow();
 
-		JDBFSupportedDbaseVersion dbaseVersion = headers.get(0).getDbaseVersion();
+        int offset = start;
 
-		JRow row = new JRow();
+        byte[] val = getBytes(bytes, offset, JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion));
 
-		int offset = start;
+        // no more rows - end of file
+        if (val == null || val[0] == BYTE_END_OF_FILE) {
+            return null;
+        }
 
-		byte[] val = getBytes(bytes, offset, JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion));
+        row.setDeleted(val[0] == BYTE_ROW_DELETED);
+        offset += JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion);
+        String encoding = JDBFContext.getDBFEncoding(dbaseVersion);
 
-		// no more rows - end of file
-		if (val == null || val[0] == BYTE_END_OF_FILE) {
-			return null;
-		}
+        for (JHeaderField jHeader : headers) {
 
-		row.setDeleted(val[0] == BYTE_ROW_DELETED);
-		offset += JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion);
-		String encoding = JDBFContext.getDBFEncoding(dbaseVersion);
+            val = getBytes(bytes, offset, jHeader.getLength());
+            Object o = switch (jHeader.getType()) {
+                case CHARACTER -> asString(val, encoding);
+                case NUMERIC, FLOAT -> asDoubleString(val);
+                case LONG -> asLong(val);
+                case DOUBLE -> asDouble(val);
+                case DATE -> asCalendar(val);
+                case LOGICAL -> asBoolean(val);
+            };
 
-		for (JHeaderField jHeader : headers) {
+            row.addValue(o);
+            offset += jHeader.getLength();
+        }
 
-			val = getBytes(bytes, offset, jHeader.getLength());
-			Object o;
-			switch (jHeader.getType()) {
-				case CHARACTER:
-					o = asString(val, encoding);
-					break;
-				case NUMERIC:
-					o = asDoubleString(val);
-					break;
-				case FLOAT:
-					o = asDoubleString(val);
-					break;
-				case LONG:
-					o = asLong(val);
-					break;
-				case DOUBLE:
-					o = asDouble(val);
-					break;
-				case DATE:
-					o = asCalendar(val);
-					break;
-				case LOGICAL:
-					o = asBoolean(val);
-					break;
-				default:
-					throw new JDBFException("Unsupported type " + jHeader.getType());
-			}
+        return row;
+    }
 
-			row.addValue(o);
-			offset += jHeader.getLength();
-		}
+    private static byte[] getBytes(byte[] bytes, int offset, int length) {
+        if (bytes.length == offset) {
+            return null;
+        }
 
-		return row;
-	}
+        byte[] ret = new byte[length];
+        System.arraycopy(bytes, offset, ret, 0, ret.length);
+        return ret;
+    }
 
-	private static byte[] getBytes(byte[] bytes, int offset, int length) {
+    private void addValue(Object val) {
+        values.add(val);
+    }
 
-		if (bytes.length == offset) {
-			return null;
-		}
+    public List<Object> getValues() {
+        return values;
+    }
 
-		byte[] ret = new byte[length];
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = bytes[i + offset];
-		}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
-		return ret;
-	}
+    /**
+     * 4 bytes. Leftmost bit used to indicate sign, 0 negative.
+     *
+     * @param bytes
+     * @return
+     */
+    public static Long asLong(byte[] bytes) {
+        if (bytes == null || bytes.length != 4) {
+            return null;
+        }
 
-	private void addValue(Object val) {
+        long res = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            int by = bytes[i] & (i == 0 ? 0x7f : 0xff);
+            res |= (long) by << 8 * (bytes.length - 1 - i);
+        }
+        boolean isNegative = (bytes[0] & 0x80) == 0;
 
-		values.add(val);
-	}
+        return isNegative ? -res : res;
+    }
 
-	public List<Object> getValues() {
+    /**
+     * Number stored as a string, right justified, and padded with blanks to the width of the field.
+     *
+     * @param bytes
+     * @return
+     */
+    public static Long asLongString(byte[] bytes) {
+        try {
+            String s = trimToNull(new String(bytes));
+            return s == null ? null : Long.valueOf(s);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-		return values;
-	}
+    /**
+     * 8 bytes - date stored as a string in the format YYYYMMDD.
+     *
+     * @param bytes
+     * @return
+     */
+    public static Calendar asCalendar(byte[] bytes) {
+        if (bytes == null || bytes.length != 8) {
+            return null;
+        }
 
-	public boolean isDeleted() {
+        String s = trimToNull(new String(bytes));
 
-		return deleted;
-	}
+        try {
+            int year = Integer.parseInt(s.substring(0, 4));
+            int month = Integer.parseInt(s.substring(4, 6));
+            int day = Integer.parseInt(s.substring(6, 8));
 
-	public void setDeleted(boolean deleted) {
+            Calendar cal = Calendar.getInstance();
+            cal.clear();
+            cal.set(year, month - 1, day);
 
-		this.deleted = deleted;
-	}
+            return cal;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-	/**
-	 * 4 bytes. Leftmost bit used to indicate sign, 0 negative.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public static Long asLong(byte[] bytes) {
+    /**
+     * 8 bytes - no conversions, stored as a double.
+     *
+     * @param bytes
+     * @return
+     */
+    public static Double asDouble(byte[] bytes) {
+        if (bytes == null || bytes.length != 8) {
+            return null;
+        }
 
-		if (bytes == null || bytes.length != 4) {
-			return null;
-		}
+        long res = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            long by = bytes[i] & (i == 0 ? 0x7f : 0xff);
+            res |= by << 8 * (bytes.length - 1 - i);
+        }
 
-		long res = 0;
-		for (int i = 0; i < bytes.length; i++) {
-			int by = bytes[i] & (i == 0 ? 0x7f : 0xff);
-			res |= by << 8 * (bytes.length - 1 - i);
-		}
-		boolean isNegative = (bytes[0] & 0x80) == 0;
+        boolean isNegative = (bytes[0] & 0x80) == 0;
 
-		return Long.valueOf(isNegative ? -res : res);
-	}
+        double d = Double.longBitsToDouble(res);
+        BigDecimal bd = BigDecimal.valueOf(d);
+        bd = bd.setScale(8, RoundingMode.HALF_UP);
 
-	/**
-	 * Number stored as a string, right justified, and padded with blanks to the width of the field.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public static Long asLongString(byte[] bytes) {
+        return isNegative ? bd.negate().doubleValue() : bd.doubleValue();
+    }
 
-		try {
-			String s = StringUtils.trimToNull(new String(bytes));
-			return s == null ? null : Long.valueOf(s);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+    /**
+     * Number stored as a string, right justified, and padded with blanks to the width of the field.
+     *
+     * @param bytes
+     * @return
+     */
+    public static Double asDoubleString(byte[] bytes) {
+        try {
+            String s = trimToNull(new String(bytes));
+            return s == null ? null : Double.valueOf(s);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-	/**
-	 * 8 bytes - date stored as a string in the format YYYYMMDD.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public static Calendar asCalendar(byte[] bytes) {
+    /**
+     * All OEM code page characters - padded with blanks to the width of the field.
+     *
+     * @param bytes
+     * @return
+     */
+    public static String asString(byte[] bytes, String encoding) {
+        try {
+            String s = new String(bytes, encoding);
+            return trimToNull(new String(s.getBytes(OUTPUT_ENCODING), OUTPUT_ENCODING));
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-		if (bytes == null || bytes.length != 8) {
-			return null;
-		}
+    /**
+     * 1 byte - initialized to 0x20 (space) otherwise T or F.
+     *
+     * @param bytes
+     * @return
+     */
+    public static Boolean asBoolean(byte[] bytes) {
+        if (bytes == null || bytes.length != 1) {
+            return null;
+        }
 
-		String s = StringUtils.trimToNull(new String(bytes));
+        String s = trimToNull(new String(bytes));
+        return "T".equals(s) ? Boolean.TRUE : "F".equals(s) ? Boolean.FALSE : null;
+    }
 
-		try {
-			int year = Integer.parseInt(s.substring(0, 4));
-			int month = Integer.parseInt(s.substring(4, 6));
-			int day = Integer.parseInt(s.substring(6, 8));
+    private static String trimToNull(String str) {
+        return str == null || str.isEmpty() ? null : str.trim();
+    }
 
-			Calendar cal = Calendar.getInstance();
-			cal.clear();
-			cal.set(year, month - 1, day);
-
-			return cal;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
-	 * 8 bytes - no conversions, stored as a double.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public static Double asDouble(byte[] bytes) {
-
-		if (bytes == null || bytes.length != 8) {
-			return null;
-		}
-
-		long res = 0;
-		for (int i = 0; i < bytes.length; i++) {
-			long by = bytes[i] & (i == 0 ? 0x7f : 0xff);
-			res |= by << 8 * (bytes.length - 1 - i);
-		}
-
-		boolean isNegative = (bytes[0] & 0x80) == 0;
-
-		double d = Double.longBitsToDouble(res);
-		BigDecimal bd = BigDecimal.valueOf(d);
-		bd = bd.setScale(8, RoundingMode.HALF_UP);
-
-		return Double.valueOf(isNegative ? bd.negate().doubleValue() : bd.doubleValue());
-	}
-
-	/**
-	 * Number stored as a string, right justified, and padded with blanks to the width of the field.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public static Double asDoubleString(byte[] bytes) {
-
-		try {
-			String s = StringUtils.trimToNull(new String(bytes));
-			return s == null ? null : Double.valueOf(s);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
-	 * All OEM code page characters - padded with blanks to the width of the field.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public static String asString(byte[] bytes, String encoding) {
-
-		try {
-			String s = new String(bytes, encoding);
-			return StringUtils.trimToNull(new String(s.getBytes(OUTPUT_ENCODING), OUTPUT_ENCODING));
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
-	 * 1 byte - initialized to 0x20 (space) otherwise T or F.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public static Boolean asBoolean(byte[] bytes) {
-
-		if (bytes == null || bytes.length != 1) {
-			return null;
-		}
-
-		String s = StringUtils.trimToNull(new String(bytes));
-		return "T".equals(s) ? Boolean.TRUE : "F".equals(s) ? Boolean.FALSE : null;
-	}
 
 }
