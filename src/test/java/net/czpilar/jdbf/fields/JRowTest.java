@@ -2,11 +2,11 @@ package net.czpilar.jdbf.fields;
 
 import net.czpilar.jdbf.context.JDBFContext;
 import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JRowTest {
 
