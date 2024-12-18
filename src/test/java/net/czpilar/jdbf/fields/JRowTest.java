@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class JRowTest {
 
-    private static final String ENCODING = JDBFContext.getDBFEncoding(JDBFSupportedDbaseVersion.DBASE_VII);
+    private static final String ENCODING = JDBFContext.DEFAULT_CHARSET_PROVIDER.provide(JDBFSupportedDbaseVersion.DBASE_VII);
 
     @Test
     public void testAsLong() {

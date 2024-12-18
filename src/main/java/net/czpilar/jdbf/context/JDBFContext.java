@@ -2,6 +2,7 @@ package net.czpilar.jdbf.context;
 
 import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import net.czpilar.jdbf.exceptions.JDBFException;
+import net.czpilar.jdbf.fields.JDBFCharsetProvider;
 
 import java.util.Map;
 
@@ -11,10 +12,6 @@ public abstract class JDBFContext {
     public static final byte BYTE_ROW_DELETED = 0x2A;
     public static final byte BYTE_END_OF_FILE = 0x1A;
 
-    private static final Map<JDBFSupportedDbaseVersion, String> DBF_ENCODING = Map.of(
-            JDBFSupportedDbaseVersion.DBASE_V, "CP852",
-            JDBFSupportedDbaseVersion.DBASE_VII, "CP1250"
-    );
     private static final Map<JDBFSupportedDbaseVersion, Integer> OFFSET_HEADER_START = Map.of(
             JDBFSupportedDbaseVersion.DBASE_V, 32,
             JDBFSupportedDbaseVersion.DBASE_VII, 68
@@ -39,10 +36,9 @@ public abstract class JDBFContext {
             JDBFSupportedDbaseVersion.DBASE_V, 1,
             JDBFSupportedDbaseVersion.DBASE_VII, 1
     );
+    public static final String DEFAULT_CHARSET = "UTF-8";
 
-    public static String getDBFEncoding(JDBFSupportedDbaseVersion dbaseVersion) {
-        return DBF_ENCODING.get(dbaseVersion);
-    }
+    public static JDBFCharsetProvider DEFAULT_CHARSET_PROVIDER = version -> DEFAULT_CHARSET;
 
     public static int getOffsetHeaderStart(JDBFSupportedDbaseVersion dbaseVersion) {
         return OFFSET_HEADER_START.get(dbaseVersion);

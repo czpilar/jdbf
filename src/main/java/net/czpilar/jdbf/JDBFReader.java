@@ -3,6 +3,7 @@ package net.czpilar.jdbf;
 import net.czpilar.jdbf.context.JDBFContext;
 import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import net.czpilar.jdbf.exceptions.JDBFException;
+import net.czpilar.jdbf.fields.JDBFCharsetProvider;
 import net.czpilar.jdbf.fields.JHeaderField;
 import net.czpilar.jdbf.fields.JRow;
 import org.slf4j.Logger;
@@ -16,33 +17,58 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static net.czpilar.jdbf.context.JDBFContext.BYTE_HEADER_END;
+import static net.czpilar.jdbf.context.JDBFContext.DEFAULT_CHARSET_PROVIDER;
 
 public class JDBFReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(JDBFReader.class);
 
-    private final List<JHeaderField> headers = new ArrayList<>();
-    private final List<JRow> rows = new ArrayList<>();
+    public static class Builder {
 
-    public JDBFReader(String filename) {
-        this(new File(filename));
-    }
+        private File file;
+        private byte[] bytes;
+        private JDBFCharsetProvider charsetProvider = DEFAULT_CHARSET_PROVIDER;
 
-    public JDBFReader(File file) {
-        try {
-            createJDBF(Files.readAllBytes(file.toPath()));
-        } catch (IOException e) {
-            throw new JDBFException(e);
+        public Builder(String fileName) {
+            this(new File(fileName));
+        }
+
+        public Builder(File file) {
+            this.file = file;
+        }
+
+        public Builder(byte[] bytes) {
+            this.bytes = bytes;
+        }
+
+        public Builder withCharsetProvider(JDBFCharsetProvider charsetProvider) {
+            this.charsetProvider = charsetProvider;
+            return this;
+        }
+
+        private byte[] getBytes() {
+            try {
+                bytes = Files.readAllBytes(file.toPath());
+            } catch (IOException e) {
+                throw new JDBFException(e);
+            }
+            return bytes;
+        }
+
+        public JDBFReader build() {
+            return new JDBFReader(getBytes(), charsetProvider);
         }
     }
 
-    public JDBFReader(byte[] bytes) {
-        createJDBF(bytes);
-    }
+    private final List<JHeaderField> headers = new ArrayList<>();
+    private final List<JRow> rows = new ArrayList<>();
 
-    private void createJDBF(byte[] bytes) {
+    public JDBFReader(byte[] bytes, JDBFCharsetProvider charsetProvider) {
+        if (bytes == null || bytes.length == 0) {
+            throw new JDBFException("Byte array is not provided");
+        }
+
         JDBFSupportedDbaseVersion dbaseVersion = JDBFContext.isDbaseVersionSupported(bytes[0]);
-
         if (dbaseVersion == null) {
             throw new JDBFException("Unsupported dBase file: " + bytes[0] + "... Supported only DBASE V ["
                     + JDBFSupportedDbaseVersion.DBASE_V.getVersion() + "], DBASE VII ["
@@ -50,6 +76,11 @@ public class JDBFReader {
         }
 
         LOG.debug("Found dbase version in byte: {}", dbaseVersion);
+
+        String charset = charsetProvider.provide(dbaseVersion);
+        if (charset == null) {
+            throw new JDBFException("Charset not provided for DBASE " + dbaseVersion);
+        }
 
         // read header
         int rowLength = 0;
@@ -74,7 +105,7 @@ public class JDBFReader {
                 + JDBFContext.getOffsetHeaderDelimiterLength(dbaseVersion);
 
         JRow row;
-        while ((row = JRow.getInstance(bytes, offsetRow, headers)) != null) {
+        while ((row = JRow.getInstance(bytes, offsetRow, headers, charset)) != null) {
             rows.add(row);
             offsetRow += rowLength + JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion);
         }

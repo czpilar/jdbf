@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static net.czpilar.jdbf.context.JDBFContext.*;
+import static net.czpilar.jdbf.context.JDBFContext.BYTE_END_OF_FILE;
+import static net.czpilar.jdbf.context.JDBFContext.BYTE_ROW_DELETED;
 
 public class JRow {
 
@@ -28,7 +29,7 @@ public class JRow {
      * @param headers
      * @return
      */
-    public static JRow getInstance(byte[] bytes, int start, List<JHeaderField> headers) {
+    public static JRow getInstance(byte[] bytes, int start, List<JHeaderField> headers, String charset) {
         JDBFSupportedDbaseVersion dbaseVersion = headers.getFirst().getDbaseVersion();
 
         JRow row = new JRow();
@@ -44,13 +45,12 @@ public class JRow {
 
         row.setDeleted(val[0] == BYTE_ROW_DELETED);
         offset += JDBFContext.getOffsetRowDeletedMarkLength(dbaseVersion);
-        String encoding = JDBFContext.getDBFEncoding(dbaseVersion);
 
         for (JHeaderField jHeader : headers) {
 
             val = getBytes(bytes, offset, jHeader.getLength());
             Object o = switch (jHeader.getType()) {
-                case CHARACTER -> asString(val, encoding);
+                case CHARACTER -> asString(val, charset);
                 case NUMERIC, FLOAT -> asDoubleString(val);
                 case LONG -> asLong(val);
                 case DOUBLE -> asDouble(val);
@@ -200,11 +200,12 @@ public class JRow {
      * All OEM code page characters - padded with blanks to the width of the field.
      *
      * @param bytes
+     * @param charset
      * @return
      */
-    public static String asString(byte[] bytes, String encoding) {
+    public static String asString(byte[] bytes, String charset) {
         try {
-            String s = new String(bytes, encoding);
+            String s = new String(bytes, charset);
             return trimToNull(new String(s.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8));
         } catch (Exception e) {
             return null;
