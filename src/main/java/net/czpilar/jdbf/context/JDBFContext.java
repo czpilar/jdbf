@@ -7,11 +7,8 @@ import java.util.Map;
 
 public abstract class JDBFContext {
 
-    public static final String OUTPUT_ENCODING = "UTF-8";
-
     public static final byte BYTE_HEADER_END = 0x0D;
     public static final byte BYTE_ROW_DELETED = 0x2A;
-    public static final byte BYTE_ROW_NOT_DELETED = 0x20;
     public static final byte BYTE_END_OF_FILE = 0x1A;
 
     private static final Map<JDBFSupportedDbaseVersion, String> DBF_ENCODING = Map.of(

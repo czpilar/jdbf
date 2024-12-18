@@ -5,6 +5,7 @@ import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -28,7 +29,7 @@ public class JRow {
      * @return
      */
     public static JRow getInstance(byte[] bytes, int start, List<JHeaderField> headers) {
-        JDBFSupportedDbaseVersion dbaseVersion = headers.get(0).getDbaseVersion();
+        JDBFSupportedDbaseVersion dbaseVersion = headers.getFirst().getDbaseVersion();
 
         JRow row = new JRow();
 
@@ -204,7 +205,7 @@ public class JRow {
     public static String asString(byte[] bytes, String encoding) {
         try {
             String s = new String(bytes, encoding);
-            return trimToNull(new String(s.getBytes(OUTPUT_ENCODING), OUTPUT_ENCODING));
+            return trimToNull(new String(s.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8));
         } catch (Exception e) {
             return null;
         }
