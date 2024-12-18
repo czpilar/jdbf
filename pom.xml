@@ -1,11 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <parent>
-        <groupId>net.czpilar.maven</groupId>
-        <artifactId>root-project</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
-    </parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.czpilar.jdbf</groupId>
@@ -13,13 +7,22 @@
     <packaging>jar</packaging>
     <version>2.0.0-SNAPSHOT</version>
     <name>jdbf</name>
+    <description>Library for reading dBASE files version 5 and 7.</description>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
             <id>david.pilar</id>
             <name>David Pilař</name>
             <email>david@czpilar.net</email>
-            <url>http://czpilar.net</url>
+            <url>https://czpilar.net</url>
             <roles>
                 <role>designer</role>
                 <role>developer</role>
@@ -27,7 +30,7 @@
             </roles>
             <timezone>+2</timezone>
             <organization>czpilar.net</organization>
-            <organizationUrl>http://czpilar.net</organizationUrl>
+            <organizationUrl>https://czpilar.net</organizationUrl>
         </developer>
     </developers>
 
@@ -41,10 +44,55 @@
         <java.target>21</java.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <version.junit>5.11.3</version.junit>
+        <version.plugin.maven-compiler-plugin>3.13.0</version.plugin.maven-compiler-plugin>
+        <version.plugin.maven-release-plugin>3.1.1</version.plugin.maven-release-plugin>
+        <version.plugin.maven-resources-plugin>3.3.1</version.plugin.maven-resources-plugin>
+        <version.plugin.maven-surefire-plugin>3.5.2</version.plugin.maven-surefire-plugin>
+
+        <version.junit>5.11.4</version.junit>
         <version.logback>1.5.12</version.logback>
         <version.slf4j>2.0.16</version.slf4j>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${version.plugin.maven-compiler-plugin}</version>
+                <configuration>
+                    <source>${java.target}</source>
+                    <target>${java.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <debug>true</debug>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${version.plugin.maven-release-plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${version.plugin.maven-resources-plugin}</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${version.plugin.maven-surefire-plugin}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/integration/**</exclude>
+                        <exclude>**/*IntegrationTest*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
