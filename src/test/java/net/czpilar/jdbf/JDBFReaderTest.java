@@ -5,6 +5,9 @@ import net.czpilar.jdbf.exceptions.JDBFException;
 import net.czpilar.jdbf.fields.JDBFCharsetProvider;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,6 +63,46 @@ public class JDBFReaderTest {
         assertNotNull(reader);
         assertEquals(33, reader.getHeaderSize());
         assertEquals(24, reader.getRowCount());
+    }
+
+    @Test
+    public void testJDBFReaderReadWithFile() {
+        JDBFReader reader7 = new JDBFReader.Builder(new File("data/2010-02-27_dbase_7/Zbozi_A.dbf"))
+                .withCharsetProvider(provider)
+                .build();
+
+        assertNotNull(reader7);
+        assertEquals(33, reader7.getHeaderSize());
+        assertEquals(18, reader7.getRowCount());
+    }
+
+    @Test
+    public void testJDBFReaderReadWithBytes() throws IOException {
+        JDBFReader reader7 = new JDBFReader.Builder(Files.readAllBytes(new File("data/2010-02-27_dbase_7/Zbozi_A.dbf").toPath()))
+                .withCharsetProvider(provider)
+                .build();
+
+        assertNotNull(reader7);
+        assertEquals(33, reader7.getHeaderSize());
+        assertEquals(18, reader7.getRowCount());
+    }
+
+    @Test
+    public void testJDBFReaderReadWithBytesNoBuilder() throws IOException {
+        JDBFReader reader7 = new JDBFReader(Files.readAllBytes(new File("data/2010-02-27_dbase_7/Zbozi_A.dbf").toPath()), provider);
+
+        assertNotNull(reader7);
+        assertEquals(33, reader7.getHeaderSize());
+        assertEquals(18, reader7.getRowCount());
+    }
+
+    @Test
+    public void testJDBFReaderWithDefaultProvider() {
+        JDBFReader reader7 = new JDBFReader.Builder("data/2010-02-27_dbase_7/Zbozi_A.dbf").build();
+
+        assertNotNull(reader7);
+        assertEquals(33, reader7.getHeaderSize());
+        assertEquals(18, reader7.getRowCount());
     }
 
     @Test

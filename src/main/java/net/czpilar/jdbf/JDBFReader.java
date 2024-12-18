@@ -47,12 +47,14 @@ public class JDBFReader {
         }
 
         private byte[] getBytes() {
+            if (file == null) {
+                return bytes;
+            }
             try {
-                bytes = Files.readAllBytes(file.toPath());
+                return Files.readAllBytes(file.toPath());
             } catch (IOException e) {
                 throw new JDBFException(e);
             }
-            return bytes;
         }
 
         public JDBFReader build() {
