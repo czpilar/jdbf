@@ -2,7 +2,6 @@ package net.czpilar.jdbf;
 
 import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import net.czpilar.jdbf.exceptions.JDBFException;
-import net.czpilar.jdbf.fields.JDBFCharsetProvider;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

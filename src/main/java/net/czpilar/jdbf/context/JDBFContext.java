@@ -2,7 +2,7 @@ package net.czpilar.jdbf.context;
 
 import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import net.czpilar.jdbf.exceptions.JDBFException;
-import net.czpilar.jdbf.fields.JDBFCharsetProvider;
+import net.czpilar.jdbf.JDBFCharsetProvider;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;

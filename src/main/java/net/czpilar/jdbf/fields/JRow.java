@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static net.czpilar.jdbf.context.JDBFContext.BYTE_END_OF_FILE;
@@ -54,7 +55,7 @@ public class JRow {
                 case NUMERIC, FLOAT -> asDoubleString(val);
                 case LONG -> asLong(val);
                 case DOUBLE -> asDouble(val);
-                case DATE -> asCalendar(val);
+                case DATE -> asDate(val);
                 case LOGICAL -> asBoolean(val);
             };
 
@@ -133,7 +134,7 @@ public class JRow {
      * @param bytes
      * @return
      */
-    public static Calendar asCalendar(byte[] bytes) {
+    public static Date asDate(byte[] bytes) {
         if (bytes == null || bytes.length != 8) {
             return null;
         }
@@ -149,7 +150,7 @@ public class JRow {
             cal.clear();
             cal.set(year, month - 1, day);
 
-            return cal;
+            return cal.getTime();
         } catch (Exception e) {
             return null;
         }

@@ -53,6 +53,8 @@ To use the `jdbf` library, follow these steps:
     - Access rows and their values:
       ```java
       int rowCount = reader.getRowCount();
+      
+      int rowIndex = 2;
       Object value = reader.getValue("ColumnName", rowIndex);
       
       int position = 5;

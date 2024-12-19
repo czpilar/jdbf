@@ -3,7 +3,6 @@ package net.czpilar.jdbf;
 import net.czpilar.jdbf.context.JDBFContext;
 import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import net.czpilar.jdbf.exceptions.JDBFException;
-import net.czpilar.jdbf.fields.JDBFCharsetProvider;
 import net.czpilar.jdbf.fields.JHeaderField;
 import net.czpilar.jdbf.fields.JRow;
 import org.slf4j.Logger;

@@ -5,6 +5,7 @@ import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,15 +57,15 @@ public class JRowTest {
     }
 
     @Test
-    public void testAsCalendar() {
-        Calendar actual = JRow.asCalendar(null);
+    public void testAsDate() {
+        Date actual = JRow.asDate(null);
         assertNull(actual);
 
-        actual = JRow.asCalendar(new byte[]{});
+        actual = JRow.asDate(new byte[]{});
         assertNull(actual);
 
         byte[] bytes = new byte[]{50, 48, 49, 48, 49, 50, 50};
-        actual = JRow.asCalendar(bytes);
+        actual = JRow.asDate(bytes);
         assertNull(actual);
 
         // 28.12.2010
@@ -72,9 +73,9 @@ public class JRowTest {
         Calendar expected = Calendar.getInstance();
         expected.clear();
         expected.set(2010, Calendar.DECEMBER, 28);
-        actual = JRow.asCalendar(bytes);
+        actual = JRow.asDate(bytes);
         assertNotNull(actual);
-        assertEquals(expected, actual);
+        assertEquals(expected.getTime(), actual);
     }
 
     @Test
