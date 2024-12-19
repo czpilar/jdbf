@@ -23,7 +23,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderStringDbase7() {
-        JDBFReader reader7 = new JDBFReader.Builder("data/2010-02-27_dbase_7/Zbozi_A.dbf")
+        JDBFReader reader7 = new JDBFReader.Builder("src/test/resources/data/2010-02-27_dbase_7/Zbozi_A.dbf")
                 .withCharsetProvider(provider)
                 .build();
 
@@ -34,7 +34,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderStringDbase5() {
-        JDBFReader reader5 = new JDBFReader.Builder("data/2010-03-25_dbase_5/Zbozi_A.dbf")
+        JDBFReader reader5 = new JDBFReader.Builder("src/test/resources/data/2010-03-25_dbase_5/Zbozi_A.dbf")
                 .withCharsetProvider(provider)
                 .build();
 
@@ -45,7 +45,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderStringDbase7EndByteProblem() {
-        JDBFReader reader = new JDBFReader.Builder("data/2012-04-16_dbase_7/Zbozi_Anef.dbf")
+        JDBFReader reader = new JDBFReader.Builder("src/test/resources/data/2012-04-16_dbase_7/Zbozi_Anef.dbf")
                 .withCharsetProvider(provider)
                 .build();
 
@@ -56,7 +56,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderStringDbase7EndByteProblem2() {
-        JDBFReader reader = new JDBFReader.Builder("data/2012-04-16_dbase_7/Zbozi_A.dbf")
+        JDBFReader reader = new JDBFReader.Builder("src/test/resources/data/2012-04-16_dbase_7/Zbozi_A.dbf")
                 .withCharsetProvider(provider)
                 .build();
 
@@ -67,7 +67,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderReadWithFile() {
-        JDBFReader reader7 = new JDBFReader.Builder(new File("data/2010-02-27_dbase_7/Zbozi_A.dbf"))
+        JDBFReader reader7 = new JDBFReader.Builder(new File("src/test/resources/data/2010-02-27_dbase_7/Zbozi_A.dbf"))
                 .withCharsetProvider(provider)
                 .build();
 
@@ -78,7 +78,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderReadWithBytes() throws IOException {
-        JDBFReader reader7 = new JDBFReader.Builder(Files.readAllBytes(new File("data/2010-02-27_dbase_7/Zbozi_A.dbf").toPath()))
+        JDBFReader reader7 = new JDBFReader.Builder(Files.readAllBytes(new File("src/test/resources/data/2010-02-27_dbase_7/Zbozi_A.dbf").toPath()))
                 .withCharsetProvider(provider)
                 .build();
 
@@ -89,7 +89,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderReadWithBytesNoBuilder() throws IOException {
-        JDBFReader reader7 = new JDBFReader(Files.readAllBytes(new File("data/2010-02-27_dbase_7/Zbozi_A.dbf").toPath()), provider);
+        JDBFReader reader7 = new JDBFReader(Files.readAllBytes(new File("src/test/resources/data/2010-02-27_dbase_7/Zbozi_A.dbf").toPath()), provider);
 
         assertNotNull(reader7);
         assertEquals(33, reader7.getHeaderSize());
@@ -98,7 +98,7 @@ public class JDBFReaderTest {
 
     @Test
     public void testJDBFReaderWithDefaultProvider() {
-        JDBFReader reader7 = new JDBFReader.Builder("data/2010-02-27_dbase_7/Zbozi_A.dbf").build();
+        JDBFReader reader7 = new JDBFReader.Builder("src/test/resources/data/2010-02-27_dbase_7/Zbozi_A.dbf").build();
 
         assertNotNull(reader7);
         assertEquals(33, reader7.getHeaderSize());
