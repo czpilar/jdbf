@@ -1,0 +1,11 @@
+jdbf
+
+Copyright 2024-2025 David Pilar
+
+Licensed under the Apache License, Version 2.0
+
+Source code is available on GitHub:
+    https://github.com/czpilar/jdbf
+
+Latest release is available on GitHub:
+    https://github.com/czpilar/jdbf/releases

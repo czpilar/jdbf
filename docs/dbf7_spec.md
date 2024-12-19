@@ -1,4 +1,4 @@
-# Data File Header Structure for the dBASE Version 7 Table File
+# DBF Structure for the dBASE Version 7
 
 **Note:** Unless prefaced by "0x", all numbers specified in the Description column of the following tables are decimal.
 

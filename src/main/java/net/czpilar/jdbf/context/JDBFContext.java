@@ -4,6 +4,7 @@ import net.czpilar.jdbf.enums.JDBFSupportedDbaseVersion;
 import net.czpilar.jdbf.exceptions.JDBFException;
 import net.czpilar.jdbf.fields.JDBFCharsetProvider;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public abstract class JDBFContext {
@@ -36,9 +37,8 @@ public abstract class JDBFContext {
             JDBFSupportedDbaseVersion.DBASE_V, 1,
             JDBFSupportedDbaseVersion.DBASE_VII, 1
     );
-    public static final String DEFAULT_CHARSET = "UTF-8";
 
-    public static JDBFCharsetProvider DEFAULT_CHARSET_PROVIDER = version -> DEFAULT_CHARSET;
+    public static JDBFCharsetProvider DEFAULT_CHARSET_PROVIDER = version -> StandardCharsets.ISO_8859_1.name();
 
     public static int getOffsetHeaderStart(JDBFSupportedDbaseVersion dbaseVersion) {
         return OFFSET_HEADER_START.get(dbaseVersion);

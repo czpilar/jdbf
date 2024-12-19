@@ -28,7 +28,7 @@ To use the `jdbf` library, follow these steps:
 
 2. **Customizing Charset**:
    - You can specify a custom charset provider if required.
-   - Default charset is `UTF-8`.
+   - Default charset is `ISO-8859-1`.
    ```java
    Map<JDBFSupportedDbaseVersion, String> dbfEncoding = Map.of(
             JDBFSupportedDbaseVersion.DBASE_V, "CP852",
@@ -64,8 +64,8 @@ To use the `jdbf` library, follow these steps:
 
 ### Additional Information
 For detailed information, see the specifications in the following files:
-- `docs/dbf5_spec.md`
-- `docs/dbf7_spec.md`
+- [dBASE 5 specification](docs/dbf5_spec.md)
+- [dBASE 7 specification](docs/dbf7_spec.md)
 
 # License
 
