@@ -35,9 +35,10 @@
     </developers>
 
     <scm>
-        <connection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</connection>
-        <developerConnection>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</developerConnection>
-        <url>scm:svn:http://dev.czpilar.net/svn/dev/java/jdbf/trunk</url>
+        <connection>scm:git:https://github.com/czpilar/jdbf.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/czpilar/jdbf.git</developerConnection>
+        <url>https://github.com/czpilar/jdbf</url>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
@@ -71,6 +72,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${version.plugin.maven-release-plugin}</version>
+                <configuration>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
