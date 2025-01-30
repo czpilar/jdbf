@@ -50,7 +50,7 @@
         <version.plugin.maven-surefire-plugin>3.5.2</version.plugin.maven-surefire-plugin>
 
         <version.junit>5.11.4</version.junit>
-        <version.logback>1.5.12</version.logback>
+        <version.logback>1.5.16</version.logback>
         <version.slf4j>2.0.16</version.slf4j>
     </properties>
 
