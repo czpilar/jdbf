@@ -4,7 +4,7 @@
     <groupId>net.czpilar.jdbf</groupId>
     <artifactId>jdbf</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.2</version>
     <name>jdbf</name>
     <description>Library for reading dBASE files</description>
 
@@ -37,7 +37,7 @@
         <connection>scm:git:https://github.com/czpilar/jdbf.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/czpilar/jdbf.git</developerConnection>
         <url>https://github.com/czpilar/jdbf</url>
-        <tag>HEAD</tag>
+        <tag>2.0.2</tag>
     </scm>
 
     <properties>
