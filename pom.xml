@@ -47,11 +47,11 @@
         <version.plugin.maven-compiler-plugin>3.14.0</version.plugin.maven-compiler-plugin>
         <version.plugin.maven-release-plugin>3.1.1</version.plugin.maven-release-plugin>
         <version.plugin.maven-resources-plugin>3.3.1</version.plugin.maven-resources-plugin>
-        <version.plugin.maven-surefire-plugin>3.5.2</version.plugin.maven-surefire-plugin>
+        <version.plugin.maven-surefire-plugin>3.5.3</version.plugin.maven-surefire-plugin>
 
-        <version.junit>5.12.1</version.junit>
-        <version.logback>1.5.17</version.logback>
-        <version.slf4j>2.0.16</version.slf4j>
+        <version.junit>5.13.4</version.junit>
+        <version.logback>1.5.18</version.logback>
+        <version.slf4j>2.0.17</version.slf4j>
     </properties>
 
     <build>
