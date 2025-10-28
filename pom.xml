@@ -44,13 +44,13 @@
         <java.target>21</java.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <version.plugin.maven-compiler-plugin>3.14.0</version.plugin.maven-compiler-plugin>
+        <version.plugin.maven-compiler-plugin>3.14.1</version.plugin.maven-compiler-plugin>
         <version.plugin.maven-release-plugin>3.1.1</version.plugin.maven-release-plugin>
         <version.plugin.maven-resources-plugin>3.3.1</version.plugin.maven-resources-plugin>
-        <version.plugin.maven-surefire-plugin>3.5.3</version.plugin.maven-surefire-plugin>
+        <version.plugin.maven-surefire-plugin>3.5.4</version.plugin.maven-surefire-plugin>
 
-        <version.junit>5.13.4</version.junit>
-        <version.logback>1.5.18</version.logback>
+        <version.junit>5.14.0</version.junit>
+        <version.logback>1.5.20</version.logback>
         <version.slf4j>2.0.17</version.slf4j>
     </properties>
 
