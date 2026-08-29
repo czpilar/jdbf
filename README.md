@@ -71,7 +71,7 @@ For detailed information, see the specifications in the following files:
 
 # License
 
-    Copyright 2024-2025 David Pilar
+    Copyright 2024-2026 David Pilar
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
